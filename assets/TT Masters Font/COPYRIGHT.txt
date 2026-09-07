@@ -1,1 +1,0 @@
-Copyright (c) 2015 by Typetype. Designer Ivan Gladkikh, technical designers Konstantin Birukov, Olexa Volochay, Maria Mizernitskaya. All rights reserved.
