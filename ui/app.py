@@ -452,7 +452,7 @@ class DiplomaApp(ctk.CTk):
         self.entry_y.pack(side="left", padx=(0, 10))
         self.entry_y.bind("<KeyRelease>", lambda e: self._schedule_live_preview())
 
-        ctk.CTkLabel(row2, text="Размер:", font=ctk.CTkFont(size=12)).pack(side="left", padx=(0, 2))
+        ctk.CTkLabel(row2, text="Размер текста:", font=ctk.CTkFont(size=12)).pack(side="left", padx=(0, 2))
         self.entry_size = ctk.CTkEntry(row2, width=55)
         self.entry_size.insert(0, str(self.cfg.get("font_size", 75)))
         self.entry_size.pack(side="left", padx=(0, 10))
