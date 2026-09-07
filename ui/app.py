@@ -205,7 +205,7 @@ class DiplomaApp(ctk.CTk):
         footer.pack(side="bottom", fill="x", padx=20, pady=(2, 6))
 
         # Левая часть футера: контакты разработчика
-        lbl_author = ctk.CTkLabel(footer, text="Разработка ПО:", font=ctk.CTkFont(size=11), text_color="gray")
+        lbl_author = ctk.CTkLabel(footer, text="Разработчик ПО:", font=ctk.CTkFont(size=11), text_color="gray")
         lbl_author.pack(side="left", padx=(0, 5))
 
         lbl_tg = ctk.CTkLabel(
