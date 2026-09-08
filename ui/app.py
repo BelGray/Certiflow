@@ -1,3 +1,4 @@
+import ctypes
 import os
 import threading
 import webbrowser
@@ -14,7 +15,7 @@ from core.config import ConfigManager
 from core.utils import (
     normalize_name,
     hex_to_rgb,
-    sanitize_filename
+    sanitize_filename, get_resource_path
 )
 
 ctk.set_appearance_mode("Dark")
@@ -25,6 +26,19 @@ class DiplomaApp(ctk.CTk):
     def __init__(self, base_dir: Path):
         super().__init__()
         self.base_dir = base_dir
+
+        try:
+            myappid = f"bel_gray.certiflow.app.{__version__}"
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        except Exception:
+            pass
+
+        icon_path = get_resource_path("assets/icon.ico")
+        if icon_path.exists():
+            try:
+                self.iconbitmap(str(icon_path))
+            except Exception:
+                pass
 
         self.config_mgr = ConfigManager(self.base_dir / "config.json", self.base_dir)
         self.cfg = self.config_mgr.load()
@@ -56,7 +70,7 @@ class DiplomaApp(ctk.CTk):
         self.name_rows: list[tuple[ctk.CTkFrame, ctk.CTkEntry]] = []
         self.is_advanced_open = False
 
-        self.title(f"{__app_name__} v{__version__}")
+        self.title(f"{__app_name__} - Генератор Грамот")
         self.geometry("940x740")
         self.minsize(820, 660)
 
@@ -70,13 +84,26 @@ class DiplomaApp(ctk.CTk):
             self.generator = None
 
     def _build_ui(self):
+
+        # Верхний брендовый бар
         top_bar = ctk.CTkFrame(self, fg_color="transparent")
-        top_bar.pack(fill="x", padx=20, pady=(10, 2))
+        top_bar.pack(fill="x", padx=20, pady=(10, 4))
+
+        # Загружаем маленькую аккуратную иконку 26x26
+        logo_img_path = get_resource_path("assets/Certiflow Logo.png")
+        if logo_img_path.exists():
+            try:
+                logo_pil = Image.open(logo_img_path).resize((26, 26), Image.Resampling.LANCZOS)
+                self.logo_ctk = ctk.CTkImage(light_image=logo_pil, dark_image=logo_pil, size=(26, 26))
+                lbl_logo_icon = ctk.CTkLabel(top_bar, image=self.logo_ctk, text="")
+                lbl_logo_icon.pack(side="left", padx=(0, 8))
+            except Exception:
+                pass
 
         ctk.CTkLabel(
             top_bar,
-            text="Выдача грамот",
-            font=ctk.CTkFont(size=20, weight="bold")
+            text="Certiflow",
+            font=ctk.CTkFont(size=22, weight="bold")
         ).pack(side="left")
 
         self.main_layout = ctk.CTkFrame(self, fg_color="transparent")
@@ -93,12 +120,12 @@ class DiplomaApp(ctk.CTk):
 
         ctk.CTkButton(
             names_header, text="📋 Список имён из буфера", width=95, height=28,
-            fg_color="#1F6FEB", hover_color="#388BFD",
             command=self._paste_from_clipboard, font=ctk.CTkFont(size=11, weight="bold")
         ).pack(side="right", padx=(4, 0))
 
         ctk.CTkButton(
             names_header, text="➕ Имя", width=65, height=28,
+            fg_color="#3B82F6", hover_color="#1B6FF8",
             command=lambda: self._add_name_row(), font=ctk.CTkFont(size=11, weight="bold")
         ).pack(side="right")
 
@@ -144,8 +171,8 @@ class DiplomaApp(ctk.CTk):
             command=self._start_generation_thread,
             font=ctk.CTkFont(size=14, weight="bold"),
             height=42,
-            fg_color="#2EA043",
-            hover_color="#238636"
+            fg_color="#3B82F6",
+            hover_color="#1B6FF8"
         )
         self.btn_generate.pack(fill="x", padx=12, pady=(0, 12))
 
@@ -243,7 +270,7 @@ class DiplomaApp(ctk.CTk):
             text_color="#8B949E", cursor="hand2"
         )
         lbl_mail.pack(side="right", padx=5)
-        lbl_mail.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/BelGray/SchoolDiplomaGenerator/blob/main/README.md"))
+        lbl_mail.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/BelGray/Certiflow/blob/main/README.md"))
 
         lbl_mail = ctk.CTkLabel(
             footer, text="Скачать последнюю версию", font=ctk.CTkFont(size=11, underline=True),
@@ -251,7 +278,7 @@ class DiplomaApp(ctk.CTk):
         )
         lbl_mail.pack(side="right", padx=5)
         lbl_mail.bind("<Button-1>", lambda e: webbrowser.open(
-            "https://github.com/BelGray/SchoolDiplomaGenerator/releases/latest"))
+            "https://github.com/BelGray/Certiflow/releases/latest"))
 
     # =========================================================================
     # ВЫСОКОПРОИЗВОДИТЕЛЬНЫЙ РАЗДЕЛИТЕЛЬ (Паттерн Event Coalescing)

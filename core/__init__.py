@@ -1,2 +1,2 @@
 __version__ = "1.0.0"
-__app_name__ = "Генератор грамот"
+__app_name__ = "Certiflow"

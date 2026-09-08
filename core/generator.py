@@ -43,7 +43,7 @@ class CertificateGenerator:
         self,
         name: str,
         base_font_size: int = 75,
-        baseline_y: Optional[int] = 765,
+        baseline_y: Optional[int] = 1140,
         target_x: Optional[int] = None,
         text_color: tuple[int, int, int] = (24, 43, 73),
     ) -> Image.Image:
@@ -52,7 +52,7 @@ class CertificateGenerator:
         img_width, img_height = img.size
 
         center_x = target_x if target_x is not None else (img_width // 2)
-        target_y = baseline_y if baseline_y is not None else 765
+        target_y = baseline_y if baseline_y is not None else 1140
 
         max_allowed_width = int(img_width * 0.70)
         font = self._get_fitted_font(name, base_font_size, max_allowed_width)
@@ -71,7 +71,7 @@ class CertificateGenerator:
         names: List[str],
         output_pdf_path: Path,
         base_font_size: int = 75,
-        baseline_y: int = 765,
+        baseline_y: int = 1140,
         target_x: Optional[int] = None,
         text_color: tuple[int, int, int] = (24, 43, 73),
         progress_callback: Optional[Callable[[int, int], None]] = None,

@@ -1,4 +1,6 @@
-# 🎓 School Diploma Generator (Генератор грамот)
+# 🎓 Certiflow (генератор грамот)
+
+![Certiflow Text Alternative Logo.png](assets/Certiflow%20Text%20Alternative%20Logo.png)
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
@@ -38,7 +40,7 @@
 
 Заполнение 30–50 грамот вручную в графических редакторах или Word отнимает часы рутинного труда, приводит к опечаткам и «съехавшим» шрифтам. 
 
-**School Diploma Generator** полностью автоматизирует этот процесс:
+**Certiflow** полностью автоматизирует этот процесс:
 * Вам **не требуется** устанавливать Python или сторонний софт — приложение работает как единый автономный файл `.exe`.
 * Имена автоматически выравниваются по базовой линии синей полосы на бланке.
 * Длинные составные фамилии автоматически ужимаются по ширине, чтобы не налезать на иллюстрации.
@@ -48,7 +50,7 @@
 
 ## ⚡ Быстрый старт (для пользователей)
 
-1. Перейдите в раздел **[Releases](https://github.com/BelGray/SchoolDiplomaGenerator/releases)** репозитория и скачайте файл `DiplomaGenerator_v1.0.0.exe`.
+1. Перейдите в раздел **[Releases](https://github.com/BelGray/Certiflow/releases)** репозитория и скачайте файл `Certiflow_v1_0_0.exe`.
 2. Запустите скачанный файл (установка не требуется, приложение портативное).
 3. Скопируйте столбец с фамилиями из школьного журнала или Excel (`Ctrl + C`) и нажмите в программе **«📋 Из буфера»**.
 4. Проверьте посадку имени на бланке в окне справа.
@@ -163,7 +165,7 @@
 Проект построен с соблюдением разделения ответственности (Separation of Concerns). Ядро генерации отвязано от интерфейса и может использоваться независимо.
 
 ```text
-SchoolDiplomaGenerator/
+Certiflow/
 ├── assets/                          # Статические ресурсы по умолчанию
 │   ├── diploma_template.png         # Исходный бланк грамоты (1054 x 1492)
 │   └── tt_masters_fonts/
@@ -191,8 +193,8 @@ SchoolDiplomaGenerator/
 
 1. **Клонируйте репозиторий:**
    ```bash
-   git clone https://github.com/BelGray/SchoolDiplomaGenerator.git
-   cd SchoolDiplomaGenerator
+   git clone https://github.com/BelGray/Certiflow.git
+   cd Certiflow
    ```
 
 2. **Создайте и активируйте виртуальное окружение Python (рекомендуется Python 3.10–3.12):**
@@ -229,19 +231,20 @@ SchoolDiplomaGenerator/
    *(При первом билде Nuitka предложит автоматически загрузить portable-компилятор MinGW64 — подтвердите ввод буквой `yes`).*
 
 2. **Запустите команду компиляции:**
-   ```bash
-   python -m nuitka --onefile \
-     --windows-console-mode=disable \
-     --enable-plugin=tk-inter \
-     --include-package=PIL \
-     --include-package-data=customtkinter \
-     --include-data-dir=assets=assets \
-     --windows-file-version=1.0.0 \
-     --windows-product-name="Генератор грамот" \
-     --windows-company-name="BelGray" \
-     --output-dir=dist \
-     main.py
-   ```
+    ```bash
+    python -m nuitka --onefile \
+    --windows-console-mode=disable \
+    --windows-icon-from-ico=assets/icon.ico \
+    --enable-plugin=tk-inter \
+    --include-package=PIL \
+    --include-package-data=customtkinter \
+    --include-data-dir=assets=assets \
+    --windows-file-version=1.0.0 \
+    --windows-product-name="Certiflow" \
+    --windows-company-name="bel_gray" \
+    --output-dir=dist \
+    main.py
+    ```
 
 3. **Результат:**
    В каталоге `dist/` появится полностью автономный файл `main.exe` размером ~25–35 Мб, готовый к передаче заказчику.
