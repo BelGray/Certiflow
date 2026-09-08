@@ -79,11 +79,12 @@ class DiplomaApp(ctk.CTk):
 
     def _init_generator(self):
         try:
-            # Если путь из конфига не существует на этом компьютере — откатываемся на встроенный в .exe
-            if not self.template_path.exists():
+            tpl_str = str(self.template_path)
+            if not self.template_path.exists() or "Temp" in tpl_str or "temp" in tpl_str or tpl_str == "DEFAULT":
                 self.template_path = get_resource_path("assets/diploma_template.png")
 
-            if not self.font_path.exists():
+            font_str = str(self.font_path)
+            if not self.font_path.exists() or "Temp" in font_str or "temp" in font_str or font_str == "DEFAULT":
                 self.font_path = get_resource_path("assets/tt_masters_fonts/TTMasters-Black.ttf")
 
             self.generator = CertificateGenerator(self.template_path, self.font_path)
@@ -625,12 +626,19 @@ class DiplomaApp(ctk.CTk):
             self._save_current_config()
 
     def _save_current_config(self):
+        # Если шаблон или шрифт встроенные (лежат в Temp) — не пишем мусор в конфиг, пишем "DEFAULT"
+        tpl_str = str(self.template_path)
+        save_tpl = "DEFAULT" if ("Temp" in tpl_str or "temp" in tpl_str or "onefile" in tpl_str) else tpl_str
+
+        font_str = str(self.font_path)
+        save_font = "DEFAULT" if ("Temp" in font_str or "temp" in font_str or "onefile" in font_str) else font_str
+
         data = {
-            "template_path": str(self.template_path),
-            "font_path": str(self.font_path),
+            "template_path": save_tpl,
+            "font_path": save_font,
             "output_dir": str(self.output_dir),
-            "font_size": int(self.entry_size.get().strip()) if self.entry_size.get().strip().isdigit() else 75,
-            "baseline_y": int(self.entry_y.get().strip()) if self.entry_y.get().strip().isdigit() else 765,
+            "font_size": int(self.entry_size.get().strip()) if self.entry_size.get().strip().isdigit() else 80,
+            "baseline_y": int(self.entry_y.get().strip()) if self.entry_y.get().strip().isdigit() else 1140,
             "coord_x": self.entry_x.get().strip(),
             "pdf_name": self.entry_filename.get().strip(),
             "text_color": self.current_color_hex,

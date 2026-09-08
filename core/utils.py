@@ -6,12 +6,18 @@ from pathlib import Path
 
 def get_resource_path(relative_path: str | Path) -> Path:
     """
-    Универсальный резолвер:
-    1. Ищет внутри распакованного бандла Nuitka/PyInstaller (__file__).
-    2. Если не нашел — ищет рядом с самим файлом .exe (sys.argv[0]).
-    3. При обычном запуске из PyCharm — берет корень проекта.
+    Универсальный резолвер путей:
+    1. Проверяет официальную переменную Nuitka --onefile (NUITKA_ONEFILE_DIRECTORY).
+    2. Проверяет распакованный бандл/корень проекта через __file__.
+    3. Проверяет папку рядом с .exe.
     """
     rel = Path(relative_path)
+
+    if "NUITKA_ONEFILE_DIRECTORY" in os.environ:
+        nuitka_dir = Path(os.environ["NUITKA_ONEFILE_DIRECTORY"])
+        path = nuitka_dir / rel
+        if path.exists():
+            return path
 
     internal_base = Path(__file__).resolve().parent.parent
     internal_path = internal_base / rel
