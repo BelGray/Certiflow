@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 from typing import Any, Dict
-from core.utils import get_resource_path
 
 
 class ConfigManager:
@@ -10,8 +9,8 @@ class ConfigManager:
         self.base_dir = base_dir
 
         self.defaults: Dict[str, Any] = {
-            "template_path": str(get_resource_path("assets/diploma_template.png")),
-            "font_path": str(get_resource_path("assets/tt_masters_fonts/TTMasters-Regular.ttf")),
+            "template_path": "DEFAULT",
+            "font_path": "DEFAULT",
             "output_dir": str(self.base_dir),
             "font_size": 80,
             "baseline_y": 1140,

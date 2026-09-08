@@ -23,34 +23,47 @@ ctk.set_default_color_theme("blue")
 
 
 class DiplomaApp(ctk.CTk):
-    def __init__(self, base_dir: Path):
+    def __init__(self, bundle_dir: Path, user_dir: Path):
         super().__init__()
-        self.base_dir = base_dir
+        self.bundle_dir = bundle_dir
+        self.user_dir = user_dir
 
+        # Железные пути к встроенным ассетам внутри программы:
+        self.default_template = self.bundle_dir / "assets" / "diploma_template.png"
+        self.default_font = self.bundle_dir / "assets" / "tt_masters_fonts" / "TTMasters-Regular.ttf"
+
+        # Иконка приложения и таскбара
         try:
             myappid = f"bel_gray.certiflow.app.{__version__}"
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+            icon_file = self.bundle_dir / "assets" / "icon.ico"
+            if icon_file.exists():
+                self.iconbitmap(str(icon_file))
         except Exception:
             pass
 
-        icon_path = get_resource_path("assets/icon.ico")
-        if icon_path.exists():
-            try:
-                self.iconbitmap(str(icon_path))
-            except Exception:
-                pass
-
-        self.config_mgr = ConfigManager(self.base_dir / "config.json", self.base_dir)
+        # Конфигурация
+        self.config_mgr = ConfigManager(self.user_dir / "config.json", self.user_dir)
         self.cfg = self.config_mgr.load()
 
-        self.template_path = Path(self.cfg["template_path"])
-        self.font_path = Path(self.cfg["font_path"])
-        self.output_dir = Path(self.cfg["output_dir"])
-        self.current_color_hex = str(self.cfg.get("text_color", "#182B49"))
+        # Разрешаем пути: если "DEFAULT" или файл не найден — берем встроенный!
+        raw_tpl = self.cfg.get("template_path", "DEFAULT")
+        if raw_tpl == "DEFAULT" or not Path(raw_tpl).exists():
+            self.template_path = self.default_template
+        else:
+            self.template_path = Path(raw_tpl)
 
+        raw_font = self.cfg.get("font_path", "DEFAULT")
+        if raw_font == "DEFAULT" or not Path(raw_font).exists():
+            self.font_path = self.default_font
+        else:
+            self.font_path = Path(raw_font)
+
+        self.output_dir = Path(self.cfg.get("output_dir", str(self.user_dir)))
+        self.current_color_hex = str(self.cfg.get("text_color", "#182B49"))
         self.right_col_width = int(self.cfg.get("right_col_width", 420))
 
-        # Генератор и кэш полноразмерного рендера в RAM
+        # Генератор и кэш
         self.generator: CertificateGenerator | None = None
         self._current_rendered_cert: Image.Image | None = None
         self._photo_ref: ImageTk.PhotoImage | None = None
@@ -58,7 +71,6 @@ class DiplomaApp(ctk.CTk):
 
         self._init_generator()
 
-        # Высокопроизводительные переменные сплиттера
         self._is_dragging_divider = False
         self._drag_start_x = 0
         self._start_col_width = self.right_col_width
@@ -70,7 +82,7 @@ class DiplomaApp(ctk.CTk):
         self.name_rows: list[tuple[ctk.CTkFrame, ctk.CTkEntry]] = []
         self.is_advanced_open = False
 
-        self.title(f"{__app_name__} - Генератор Грамот")
+        self.title("Certiflow - Генератор Грамот")
         self.geometry("940x740")
         self.minsize(820, 660)
 
@@ -79,13 +91,10 @@ class DiplomaApp(ctk.CTk):
 
     def _init_generator(self):
         try:
-            tpl_str = str(self.template_path)
-            if not self.template_path.exists() or "Temp" in tpl_str or "temp" in tpl_str or tpl_str == "DEFAULT":
-                self.template_path = get_resource_path("assets/diploma_template.png")
-
-            font_str = str(self.font_path)
-            if not self.font_path.exists() or "Temp" in font_str or "temp" in font_str or font_str == "DEFAULT":
-                self.font_path = get_resource_path("assets/tt_masters_fonts/TTMasters-Black.ttf")
+            if not self.template_path.exists():
+                self.template_path = self.default_template
+            if not self.font_path.exists():
+                self.font_path = self.default_font
 
             self.generator = CertificateGenerator(self.template_path, self.font_path)
         except Exception as e:
@@ -99,7 +108,7 @@ class DiplomaApp(ctk.CTk):
         top_bar.pack(fill="x", padx=20, pady=(10, 4))
 
         # Загружаем маленькую аккуратную иконку 26x26
-        logo_img_path = get_resource_path("assets/Certiflow Logo.png")
+        logo_img_path = self.bundle_dir / "assets" / "Certiflow Logo.png"
         if logo_img_path.exists():
             try:
                 logo_pil = Image.open(logo_img_path).resize((26, 26), Image.Resampling.LANCZOS)
@@ -626,12 +635,9 @@ class DiplomaApp(ctk.CTk):
             self._save_current_config()
 
     def _save_current_config(self):
-        # Если шаблон или шрифт встроенные (лежат в Temp) — не пишем мусор в конфиг, пишем "DEFAULT"
-        tpl_str = str(self.template_path)
-        save_tpl = "DEFAULT" if ("Temp" in tpl_str or "temp" in tpl_str or "onefile" in tpl_str) else tpl_str
-
-        font_str = str(self.font_path)
-        save_font = "DEFAULT" if ("Temp" in font_str or "temp" in font_str or "onefile" in font_str) else font_str
+        # Если шаблон совпадает со встроенным — пишем в конфиг просто "DEFAULT"
+        save_tpl = "DEFAULT" if self.template_path == self.default_template else str(self.template_path)
+        save_font = "DEFAULT" if self.font_path == self.default_font else str(self.font_path)
 
         data = {
             "template_path": save_tpl,
