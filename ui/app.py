@@ -79,8 +79,16 @@ class DiplomaApp(ctk.CTk):
 
     def _init_generator(self):
         try:
+            # Если путь из конфига не существует на этом компьютере — откатываемся на встроенный в .exe
+            if not self.template_path.exists():
+                self.template_path = get_resource_path("assets/diploma_template.png")
+
+            if not self.font_path.exists():
+                self.font_path = get_resource_path("assets/tt_masters_fonts/TTMasters-Black.ttf")
+
             self.generator = CertificateGenerator(self.template_path, self.font_path)
-        except Exception:
+        except Exception as e:
+            print(f"Ошибка инициализации генератора: {e}")
             self.generator = None
 
     def _build_ui(self):

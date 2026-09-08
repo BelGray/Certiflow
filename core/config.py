@@ -1,15 +1,17 @@
 import json
 from pathlib import Path
 from typing import Any, Dict
+from core.utils import get_resource_path
 
 
 class ConfigManager:
     def __init__(self, config_file: Path, base_dir: Path):
         self.config_file = config_file
         self.base_dir = base_dir
+
         self.defaults: Dict[str, Any] = {
-            "template_path": str(self.base_dir / "assets" / "diploma_template.png"),
-            "font_path": str(self.base_dir / "assets" / "tt_masters_fonts" / "TTMasters-Regular.ttf"),
+            "template_path": str(get_resource_path("assets/diploma_template.png")),
+            "font_path": str(get_resource_path("assets/tt_masters_fonts/TTMasters-Regular.ttf")),
             "output_dir": str(self.base_dir),
             "font_size": 80,
             "baseline_y": 1140,
@@ -18,6 +20,7 @@ class ConfigManager:
             "text_color": "#182B49",
             "auto_format": True,
             "auto_open": True,
+            "right_col_width": 420,
         }
 
     def load(self) -> Dict[str, Any]:
